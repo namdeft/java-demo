@@ -1,0 +1,31 @@
+package com.example.demo.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.dto.request.UserDto;
+import com.example.demo.service.JwtAuthService;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "Auth", description = "API Auth")
+@RestController
+@RequestMapping("/auth")
+public class AuthController {
+  @Autowired
+  private JwtAuthService jwtAuthService;
+
+  @PostMapping("/register")
+  public ResponseEntity<?> register(@RequestBody UserDto userRequest) {
+    return ResponseEntity.ok(jwtAuthService.register(userRequest));
+  }
+
+  @PostMapping("/login")
+  public ResponseEntity<?> login(@RequestBody UserDto authRequest) {
+    return ResponseEntity.ok(jwtAuthService.login(authRequest));
+  }
+}
