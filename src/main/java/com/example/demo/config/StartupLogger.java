@@ -1,6 +1,5 @@
-package com.example.demo.logger;
+package com.example.demo.config;
 
-import org.springframework.core.env.Environment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
