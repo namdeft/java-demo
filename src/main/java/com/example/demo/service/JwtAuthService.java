@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -7,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.constant.CommonMsg;
-import com.example.demo.dto.request.UserDto;
+import com.example.demo.dto.request.AuthDto;
 import com.example.demo.dto.response.BaseResponse;
 import com.example.demo.dto.response.LoginResponse;
 import com.example.demo.dto.response.UserResponse;
@@ -33,19 +34,19 @@ public class JwtAuthService {
   @Autowired
   private JwtTokenProvider jwtTokenProvider;
 
-  public BaseResponse<?> register(UserDto userRequest) {
-    if (userRepository.findByUsername(userRequest.getUsername()) != null) {
+  public BaseResponse<?> register(AuthDto authRequest) {
+    if (userRepository.findByUsernameAndDeletedAtIsNull(authRequest.getUsername()) != null) {
       return BaseResponse.error(CommonMsg.DUPLICATE_USERNAME);
     }
 
     User newUser = new User();
-    newUser.setUsername(userRequest.getUsername());
-    newUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+    newUser.setUsername(authRequest.getUsername());
+    newUser.setPassword(passwordEncoder.encode(authRequest.getPassword()));
     Set<Role> roles = new HashSet<>();
-    Role userRole = roleRepository.findByName("USER");
+    Role userRole = roleRepository.findByName("MAM3");
     if (userRole == null) {
       userRole = new Role();
-      userRole.setName("USER");
+      userRole.setName("MAM3");
       roleRepository.save(userRole);
     }
 
@@ -58,8 +59,8 @@ public class JwtAuthService {
     return BaseResponse.success(CommonMsg.REGISTER_SUCCESS, userResponse);
   }
 
-  public BaseResponse<?> login(UserDto authRequest) {
-    User user = userRepository.findByUsername(authRequest.getUsername());
+  public BaseResponse<?> login(AuthDto authRequest) {
+    User user = userRepository.findByUsernameAndDeletedAtIsNull(authRequest.getUsername());
     if (user == null || !passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
       return BaseResponse.error(CommonMsg.LOGIN_FAILED);
     }
@@ -77,6 +78,17 @@ public class JwtAuthService {
     UserResponse userResponse = new UserResponse();
     userResponse.setId(user.getId());
     userResponse.setUsername(user.getUsername());
+    Set<String> rolesSet = new HashSet<>();
+    for (Role role : user.getRoles()) {
+      rolesSet.add(role.getName());
+    }
+    userResponse.setRoles(new ArrayList<>(rolesSet));
+
+    Set<String> permissionsSet = new HashSet<>();
+    for (Role role : user.getRoles()) {
+      role.getPermissions().forEach(permission -> permissionsSet.add(permission.getName()));
+    }
+    userResponse.setPermissions(new ArrayList<>(permissionsSet));
 
     return userResponse;
   }

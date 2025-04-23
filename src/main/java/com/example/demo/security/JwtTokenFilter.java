@@ -46,7 +46,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     try {
       if (token != null && jwtTokenProvider.validateToken(token)) {
         String username = jwtTokenProvider.getUsername(token);
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsernameAndDeletedAtIsNull(username);
         List<GrantedAuthority> authorities = jwtTokenProvider.getAuthorities(token);
 
         if (user != null) {

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.dto.request.UserDto;
+import com.example.demo.dto.request.AuthDto;
 import com.example.demo.service.JwtAuthService;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,12 +20,12 @@ public class AuthController {
   private JwtAuthService jwtAuthService;
 
   @PostMapping("/register")
-  public ResponseEntity<?> register(@RequestBody UserDto userRequest) {
-    return ResponseEntity.ok(jwtAuthService.register(userRequest));
+  public ResponseEntity<?> register(@RequestBody AuthDto authRequest) {
+    return ResponseEntity.ok(jwtAuthService.register(authRequest));
   }
 
   @PostMapping("/login")
-  public ResponseEntity<?> login(@RequestBody UserDto authRequest) {
+  public ResponseEntity<?> login(@RequestBody AuthDto authRequest) {
     return ResponseEntity.ok(jwtAuthService.login(authRequest));
   }
 }

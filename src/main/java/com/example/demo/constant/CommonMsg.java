@@ -21,7 +21,11 @@ public enum CommonMsg {
   PASSWORD_FORMAT_INVALID(4004, "Mật khẩu phải từ 6 đến 50 ký tự"),
 
   // Duplicate
-  DUPLICATE_USERNAME(4005, "Tên tài khoản đã tồn tại. Vui lòng thử lại.");
+  DUPLICATE_USERNAME(4005, "Tên tài khoản đã tồn tại. Vui lòng thử lại."),
+
+  GET_USERS_SUCCESS(2000, "Lấy danh sách người dùng thành công"),
+  DELETE_USER_SUCCESS(2001, "Xóa người dùng thành công"),
+  ;
 
   private final int code;
   private final String message;
