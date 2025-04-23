@@ -40,41 +40,28 @@ public class DataInitializer {
     Permission readPermission = createPermissionIfNotFound("READ");
     Permission writePermission = createPermissionIfNotFound("WRITE");
     Permission deletePermission = createPermissionIfNotFound("DELETE");
-    Permission adminPermission = createPermissionIfNotFound("ADMIN");
 
     // Khởi tạo roles
-    Role adminRole = createRoleIfNotFound("ADMIN", new HashSet<>(Arrays.asList(
-        readPermission, writePermission, deletePermission, adminPermission)));
+    Role adminRole = createRoleIfNotFound("MAM1", new HashSet<>(Arrays.asList(
+        readPermission, writePermission, deletePermission)));
 
-    Role moderatorRole = createRoleIfNotFound("MODERATOR", new HashSet<>(Arrays.asList(
-        readPermission, writePermission)));
-
-    Role userRole = createRoleIfNotFound("USER", new HashSet<>(Arrays.asList(
+    Role userRole = createRoleIfNotFound("MAM3", new HashSet<>(Arrays.asList(
         readPermission)));
 
-    // Khởi tạo admin user
-    if (userRepository.findByUsername("admin") == null) {
+    // Khởi tạo acc mâm1
+    if (userRepository.findByUsernameAndDeletedAtIsNull("admin") == null) {
       User admin = new User();
       admin.setUsername("admin");
-      admin.setPassword(passwordEncoder.encode("admin123"));
+      admin.setPassword(passwordEncoder.encode("123456"));
       admin.setRoles(new HashSet<>(Arrays.asList(adminRole)));
       userRepository.save(admin);
     }
 
-    // Khởi tạo moderator user
-    if (userRepository.findByUsername("moderator") == null) {
-      User moderator = new User();
-      moderator.setUsername("moderator");
-      moderator.setPassword(passwordEncoder.encode("mod123"));
-      moderator.setRoles(new HashSet<>(Arrays.asList(moderatorRole)));
-      userRepository.save(moderator);
-    }
-
-    // Khởi tạo normal user
-    if (userRepository.findByUsername("user") == null) {
+    // Khởi tạo acc mâm3
+    if (userRepository.findByUsernameAndDeletedAtIsNull("user") == null) {
       User user = new User();
       user.setUsername("user");
-      user.setPassword(passwordEncoder.encode("user123"));
+      user.setPassword(passwordEncoder.encode("123456"));
       user.setRoles(new HashSet<>(Arrays.asList(userRole)));
       userRepository.save(user);
     }
