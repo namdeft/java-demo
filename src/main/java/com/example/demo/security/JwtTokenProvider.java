@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,15 +16,24 @@ import org.springframework.stereotype.Component;
 
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
+import com.example.demo.service.RedisService;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
+@Getter
+@Setter
 public class JwtTokenProvider {
+  @Autowired
+  private RedisService redisService;
 
   @Value("${jwtSecret}")
   private String secretKey;
@@ -53,12 +63,15 @@ public class JwtTokenProvider {
     Date now = new Date();
     Date validity = new Date(now.getTime() + validityInMilliseconds);
 
-    return Jwts.builder()
+    String token = Jwts.builder()
         .setClaims(claims)
         .setIssuedAt(now)
         .setExpiration(validity)
         .signWith(SignatureAlgorithm.HS256, secretKey)
         .compact();
+
+    redisService.saveToken(user.getUsername(), token, validityInMilliseconds / 1000);
+    return token;
   }
 
   public String getUsername(String token) {
@@ -70,6 +83,11 @@ public class JwtTokenProvider {
   public boolean validateToken(String token) {
     try {
       Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+
+      if (redisService.isTokenBlacklisted(token)) {
+        log.warn("Token đã bị thu hồi: {}", token);
+        return false;
+      }
       return true;
     } catch (JwtException | IllegalArgumentException e) {
       return false;
